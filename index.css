@@ -1,0 +1,155 @@
+/* index.css */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Times New Roman', Times, serif;
+    background-color: #28292e;
+    margin: 0;
+}
+
+header {
+    display: flex;
+    align-items: flex-start;
+    padding: 20px 30px;
+    background-color: #202127;
+}
+
+.logo {
+    flex: 0;
+}
+
+.logo a {
+    text-decoration: none;
+    font-size: 30px;
+    font-weight: bold;
+    color: #f5b041;
+}
+
+nav {
+    margin-left: auto;
+    display: flex;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    margin-left: 200px;
+    gap: 20px;
+}
+
+nav ul li {
+    display: flex;
+}
+
+nav ul li a {
+    text-decoration: none;
+    color: #ffffff;
+    font-size: auto;
+    display: flex;
+    align-items: start;
+}
+
+nav ul li a i {
+    margin-right: 15px;
+}
+
+nav ul li a:hover {
+    color: #f5b041;
+}
+
+.team-description {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #cad6d6;
+}
+
+.logo img {
+    width: 200px; 
+    height: auto;
+    margin-right: 2px;
+}
+
+.cards-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+    height: auto;
+    background-color: #cad6d6;
+    padding-top: 200px;
+}
+
+.card {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #cfcdcd;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    width: 300px;
+    height: auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-decoration: none; /* Remove underline from link */
+    color: inherit; /* Inherit text color */
+    transition: transform 0.2s; /* Animation for hover */
+}
+
+.card:hover {
+    transform: translateY(-3px); /* Lift effect on hover */
+}
+
+.card i {
+    font-size: 40px;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.card h3 {
+    font-size: 18px ;
+    color: #1a1a1a;
+}
+
+
+.info-section {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+.info-column {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.info-column h3 {
+    font-size: 20px;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+}
+
+.info-column p {
+    font-size: 16px;
+    color: #555555;
+}
+
+.info-column a {
+    text-decoration: none;
+    color: #1a1a1a;
+}
+
+.info-column a:hover {
+    color: #f5b041;
+}
+
+.info-column i {
+    margin-right: 8px;
+}

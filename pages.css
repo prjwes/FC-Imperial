@@ -1,0 +1,158 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items:flex-end;
+    background-color: #333;
+    padding: 10px 20px;
+    width: 100%;
+}
+
+.logo a {
+    color: #f5b041;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: auto;
+}
+
+nav {
+    margin-left: auto;
+}
+
+nav ul {
+    display: flex;
+    justify-content: flex-end;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav ul li {
+    margin-left: 10px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 11px;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center; 
+}
+
+nav ul li a i {
+    margin-right: 1px;
+}
+
+nav ul li a:hover {
+    color: #f5b041;
+}
+
+@media only screen and (max-width: 768px) {
+    header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    nav ul {
+        flex-direction: row-reverse;
+    }
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #a1b6b2;
+}
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.content {
+    width: 100%;
+    max-width: 1200px;
+    background-color: #000;
+    border-radius: 10px;
+    overflow: hidden;
+    color: white;
+    position: relative;
+}
+.background {
+    display: flex;
+    height: 200px;
+    background: linear-gradient(to right, #00000010 25%, #90b3b0 75%);
+    position: relative;
+}
+.background img {
+    position: absolute;
+    left: 1%;
+    transform: translateX(-15%);
+    top: 0;
+    height: 100%;
+    z-index: 1;
+}
+.logo {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 3;
+    font-size: 36px;
+    color: white;
+    font-weight: bold;
+}
+.menu-bars {
+    position: absolute;
+    right: 0;
+    top: 60%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 4;
+    padding-right: 5px;
+}
+.menu-bars .menu {
+    display: flex;
+    align-items: center;
+    background-color: #333;
+    padding: 10px 20px;
+    color: #f5b041;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 150px;
+}
+.menu-bars .menu:hover {
+    background-color: #000000;
+}
+.menu-icon {
+    margin-right: 10px;
+}
+.menu a {
+    color: #f5b041;
+}
+.text-content {
+    padding: 20px;
+    background-color: white;
+    color: black;
+}
+ul {
+    list-style: none;
+}
+ul li {
+    padding: 10px 0;
+}

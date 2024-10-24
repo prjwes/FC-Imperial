@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" >
+    <title>Updates</title>
+    <link rel="stylesheet" href="updates.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="index.html">IMPERIAL</a>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#about"><i class="fas fa-info-circle"></i> About</a></li>
+                <li><a href="#contact"><i class="fas fa-envelope"></i> Contact Us</a></li>
+                <li><a href="#pages"><i class="fas fa-file-alt"></i> Pages</a></li>
+            </ul>
+        </nav>
+        
+    </header>
+    <div class="container">
+        <input type="text" id="postContent" placeholder="What's happening?" />
+        <input type="file" id="mediaInput" accept="image/*, video/*" style="display:none"/>
+        <button class="post-button" onclick="createPost()">Post</button>
+        <button class="post-button" onclick="document.getElementById('mediaInput').click()">+</button>
+        <button class="post-button" onclick="recordAudio()">🎤</button>
+        <div id="posts"></div>
+    </div>
+
+    <script>
+        let mediaInput = document.getElementById('mediaInput');
+        const currentUser = "current_user";  // Replace with actual username
+        const admin = "Wess";
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            loadPosts();
+        });
+
+        function savePosts(posts) {
+            localStorage.setItem('posts', JSON.stringify(posts));
+        }
+
+        function loadPosts() {
+            const posts = JSON.parse(localStorage.getItem('posts')) || [];
+            posts.reverse().forEach(post => renderPost(post)); // Newest posts on top
+        }
+
+        function createPost() {
+            const postContent = document.getElementById('postContent').value;
+            const mediaInputFile = mediaInput.files[0];
+            let caption = "";
+
+            if (mediaInputFile) {
+                caption = prompt("Enter a caption for the media:");
+            }
+
+            if (postContent || mediaInputFile) {
+                let post = {
+                    id: Date.now(),
+                    user: currentUser,
+                    content: postContent,
+                    media: mediaInputFile ? URL.createObjectURL(mediaInputFile) : null,
+                    type: mediaInputFile ? mediaInputFile.type : null,
+                    likes: 0,
+                    comments: [],
+                    likedBy: [],
+                    timestamp: new Date().toLocaleString(),
+                    caption: caption
+                };
+                saveNewPost(post);
+                renderPost(post, true); // Add to top
+                document.getElementById('postContent').value = '';
+                mediaInput.value = '';
+            }
+        }
+
+        function saveNewPost(post) {
+            const posts = JSON.parse(localStorage.getItem('posts')) || [];
+            posts.unshift(post); // Add to the beginning
+            savePosts(posts);
+        }
+
+        function renderPost(post, addToTop = false) {
+            let postElement = document.createElement('div');
+            postElement.className = 'post';
+            postElement.dataset.postId = post.id;
+
+            postElement.innerHTML = `<strong>${post.user}</strong>`;
+            if (post.content) {
+                postElement.innerHTML += `<p>${post.content}</p>`;
+            }
+            if (post.media) {
+                if (post.type.startsWith('image/')) {
+                    postElement.innerHTML += `<img src="${post.media}" alt="media"/>`;
+                } else if (post.type.startsWith('video/')) {
+                    postElement.innerHTML += `<video controls src="${post.media}"></video>`;
+                }
+                if (post.caption) {
+                    postElement.innerHTML += `<p>${post.caption}</p>`;
+                }
+            }
+            postElement.innerHTML += `
+                <button class="like-button" onclick="likePost(this)">👍</button> <span>${post.likes} Likes</span>
+                <span>${post.timestamp}</span>
+                <input type="text" placeholder="Add a comment..." onkeydown="if(event.key === 'Enter') addComment(this)" />
+                <input type="file" accept="image/*, video/*" style="display:block" onchange="addMediaComment(this)" />
+                <div class="comments"></div>
+                <button class="delete-button" onclick="deletePost(this)">Delete</button>
+            `;
+
+            if (addToTop) {
+                document.getElementById('posts').prepend(postElement);
+            } else {
+                document.getElementById('posts').appendChild(postElement);
+            }
+
+            post.comments.forEach(comment => renderComment(postElement.querySelector('.comments'), comment, post.user));
+        }
+
+        function renderComment(commentContainer, comment, postUser) {
+            let commentElement = document.createElement('div');
+            commentElement.className = 'comment';
+            commentElement.dataset.commentId = comment.id;
+
+            if (comment.type === 'text') {
+                commentElement.innerHTML = `<p>${comment.content}</p>`;
+            } else if (comment.type.startsWith('image/')) {
+                commentElement.innerHTML = `<img src="${comment.content}" alt="comment media"/>`;
+            } else if (comment.type.startsWith('video/')) {
+                commentElement.innerHTML = `<video controls src="${comment.content}"></video>`;
+            }
+            commentElement.innerHTML += `
+                <button class="like-button" onclick="likeComment(this)">👍</button> <span>${comment.likes} Likes</span>
+                <button class="delete-button" onclick="deleteComment(this)">Delete</button>
+            `;
+
+            commentContainer.appendChild(commentElement);
+        }
+
+        function addComment(inputElement) {
+            let commentContent = inputElement.value;
+            if (commentContent) {
+                const postElement = inputElement.closest('.post');
+                const comment = { id: Date.now(), user: currentUser, content: commentContent, type: 'text', likes: 0, likedBy: [] };
+                renderComment(postElement.querySelector('.comments'), comment, postElement.querySelector('strong').innerText);
+                updatePostComments(postElement, comment);
+                inputElement.value = '';
+            }
+        }
+
+        function addMediaComment(inputElement) {
+            const mediaInputFile = inputElement.files[0];
+            if (mediaInputFile) {
+                const postElement = inputElement.closest('.post');
+                const comment = { id: Date.now(), user: currentUser, content: URL.createObjectURL(mediaInputFile), type: mediaInputFile.type, likes: 0, likedBy: [] };
+                renderComment(postElement.querySelector('.comments'), comment, postElement.querySelector('strong').innerText);
+                updatePostComments(postElement, comment);
+                inputElement.value = '';
+            }
+        }
+
+        function updatePostComments(postElement, comment) {
+            const posts = JSON.parse(localStorage.getItem('posts'));
+            const postId = postElement.dataset.postId;
+            const post = posts.find(p => p.id == postId);
+            post.comments.push(comment);
+            savePosts(posts);
+        }
+
+        function likePost(buttonElement) {
+            const postElement = buttonElement.closest('.post');
+            const posts = JSON.parse(localStorage.getItem('posts'));
+            const postId = postElement.dataset.postId;
+            const post = posts.find(p => p.id == postId);
+
+            if (!post.likedBy.includes(currentUser)) {
+                post.likes += 1;
+                post.likedBy.push(currentUser);
+                buttonElement.nextElementSibling.innerHTML = `${post.likes} Likes`;
+                savePosts(posts);
+            }
+        }
+
+        function likeComment(buttonElement) {
+            const commentElement = buttonElement.closest('.comment');
+            const postElement = buttonElement.closest('.post');
+            const posts = JSON.parse(localStorage.getItem('posts'));
+            const postId = postElement.dataset.postId;
+            const post = posts.find(p => p.id == postId);
+            const commentId = commentElement.dataset.commentId;
+            const comment = post.comments.find(c => c.id == commentId);
+
+            if (!comment.likedBy.includes(currentUser)) {
+                comment.likes += 1;
+                comment.likedBy.push(currentUser);
+                buttonElement.nextElementSibling.innerHTML = `${comment.likes} Likes`;
+                savePosts(posts);
+            }
+        }
+
+        function deletePost(buttonElement) {
+            const postElement = buttonElement.closest('.post');
+            const postId = postElement.dataset.postId;
+            let posts = JSON.parse(localStorage.getItem('posts'));
+
+            const post = posts.find(p => p.id == postId);
+            if (post.user === currentUser || currentUser === admin) {
+                posts = posts.filter(p => p.id !== postId);
+                savePosts(posts);
+                postElement.remove();
+            }
+        }
+
+        function deleteComment(buttonElement) {
+            const commentElement = buttonElement.closest('.comment');
+            const postElement = buttonElement.closest('.post');
+            const postId = postElement.dataset.postId;
+            const commentId = commentElement.dataset.commentId;
+            let posts = JSON.parse(localStorage.getItem('posts'));
+
+            const post = posts.find(p => p.id == postId);
+            const comment = post.comments.find(c => c.id == commentId);
+            if (comment.user === currentUser || currentUser === admin) {
+                post.comments = post.comments.filter(c => c.id !== commentId);
+                savePosts(posts);
+                commentElement.remove();
+            }
+        }
+
+        function recordAudio() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    const mediaRecorder = new MediaRecorder(stream);
+                    let audioChunks = [];
+
+                    mediaRecorder.ondataavailable = event => {
+                        audioChunks.push(event.data);
+                    };
+
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        const audioURL = URL.createObjectURL(audioBlob);
+
+                        let post = {
+                            id: Date.now(),
+                            user: currentUser,
+                            content: '',
+                            media: audioURL,
+                            type: 'audio',
+                            likes: 0,
+                            comments: [],
+                            likedBy: [],
+                            timestamp: new Date().toLocaleString()
+                        };
+                        saveNewPost(post);
+                        renderPost(post, true); // Add to top
+                    };
+
+                    mediaRecorder.start();
+                    setTimeout(() => mediaRecorder.stop(), 5000);  // Record for 5 seconds
+                })
+                .catch(error => console.error('Error accessing microphone:', error));
+        }
+    </script>
+</body>
+</html>
